@@ -116,4 +116,4 @@ class Reign {
 	}
 }
 
-export { Reign };
+export default Reign;
