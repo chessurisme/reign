@@ -2,16 +2,16 @@
  * Verifies the parameters passed to the Reign constructor.
  *
  * @param {String} databaseName - The name of the database
- * @param {Array} storeName - The name of the store
+ * @param {String[]} storeNames - The name of the stores
  * @param {Number} version - The version of the store
  * @throws {Error} If any of the parameters is invalid
  */
-function verifyParameters(databaseName, storeName, version) {
+function verifyParameters(databaseName, storeNames, version) {
 	if (!databaseName || typeof databaseName !== 'string') {
 		throw new Error('Database name is required and must be a string');
 	}
 
-	if (!Array.isArray(storeName) || storeName.length === 0 || !storeName.every((name) => typeof name === 'string')) {
+	if (!Array.isArray(storeNames) || storeNames.length === 0 || !storeNames.every((name) => typeof name === 'string')) {
 		throw new Error('Store name is required and must be an array of strings');
 	}
 
