@@ -1,27 +1,33 @@
 <img src="./assets/Reign.png" alt="Reign logo" height="150">
 
-# Reign
+# Reign IDB
 
 The `Reign` class is a lightweight library for managing IndexedDB operations in modern web applications. It simplifies database interactions like creating, updating, retrieving, and deleting records using a clean and intuitive API.
 
-## Features
+## Features 🌟
 
-- Easy setup and initialization of IndexedDB databases.
-- Support for multiple object store creation during database upgrades.
-- CRUD operations (`create`, `read`, `update`, and `delete`) with asynchronous promises.
-- Designed for flexibility and reusability in modern JavaScript applications.
+- Easy setup and initialization of IndexedDB databases
+- Support for multiple object store creation during database upgrades
+- CRUD operations (`create`, `read`, `update`, and `delete`) with asynchronous promises
+- Designed for flexibility and reusability in modern JavaScript applications
 
-## Installation
+## Installation 📦
 
-You can include the `Reign` class in your project by importing it directly:
+You can install Reign IDB using npm:
 
-```javascript
-import Reign from './path/to/Reign';
+```bash
+npm install reign-idb
 ```
 
-Ensure you also have the utility modules (`verifyParameters` and `createTransaction`) available.
+## Import 🔌
 
-## Usage
+Import the Reign class in your JavaScript project:
+
+```javascript
+import Reign from 'reign-idb';
+```
+
+## Usage 🚀
 
 ### Creating a Reign Instance
 
@@ -79,7 +85,7 @@ await db.delete('Users', 1);
 console.log('Record deleted');
 ```
 
-## API Reference
+## API Reference 📘
 
 ### Constructor
 
@@ -87,9 +93,9 @@ console.log('Record deleted');
 new Reign({ databaseName, storeNames, version });
 ```
 
-- **`databaseName`** (`String`): Name of the IndexedDB database.
-- **`storeNames`** (`String[]`): Array of object store names to create.
-- **`version`** (`Number`): Version number for the database.
+- **`databaseName`** (`String`): Name of the IndexedDB database
+- **`storeNames`** (`String[]`): Array of object store names to create
+- **`version`** (`Number`): Version number for the database
 
 ### Methods
 
@@ -105,10 +111,10 @@ Initializes the database connection. Creates the specified object stores if they
 
 Adds or updates a record in the specified object store.
 
-- **`storeName`** (`String`): Name of the object store.
-- **`data`** (`Object`): The record to add or update.
+- **`storeName`** (`String`): Name of the object store
+- **`data`** (`Object`): The record to add or update
 
-**Returns**: `Promise<number>` – The ID of the added or updated record.
+**Returns**: `Promise<number>` – The ID of the added or updated record
 
 ---
 
@@ -116,7 +122,7 @@ Adds or updates a record in the specified object store.
 
 Retrieves all records from the specified object store.
 
-- **`storeName`** (`String`): Name of the object store.
+- **`storeName`** (`String`): Name of the object store
 
 **Returns**: `Promise<Array<Object>>`
 
@@ -126,8 +132,8 @@ Retrieves all records from the specified object store.
 
 Retrieves a specific record by its ID from the specified object store.
 
-- **`storeName`** (`String`): Name of the object store.
-- **`id`** (`Number`): The ID of the record to retrieve.
+- **`storeName`** (`String`): Name of the object store
+- **`id`** (`Number`): The ID of the record to retrieve
 
 **Returns**: `Promise<Object>`
 
@@ -137,14 +143,14 @@ Retrieves a specific record by its ID from the specified object store.
 
 Deletes a specific record by its ID from the specified object store.
 
-- **`storeName`** (`String`): Name of the object store.
-- **`id`** (`Number`): The ID of the record to delete.
+- **`storeName`** (`String`): Name of the object store
+- **`id`** (`Number`): The ID of the record to delete
 
 **Returns**: `Promise<undefined>`
 
-## Error Handling
+## Error Handling ⚠️
 
-All methods reject with an appropriate error if an operation fails. Use `try-catch` blocks or `.catch` handlers to manage errors gracefully.
+All methods reject with an appropriate error if an operation fails. Use `try-catch` blocks or `.catch` handlers to manage errors gracefully:
 
 ```javascript
 try {
@@ -154,6 +160,14 @@ try {
 }
 ```
 
-## License
+## Browser Compatibility 🌐
+
+Reign IDB requires modern browsers with IndexedDB support. Most contemporary browsers (Chrome, Firefox, Safari, Edge) are fully compatible.
+
+## Contributing 🤝
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## License 📄
 
 This project is open-source and available under the [MIT License](LICENSE.md).
