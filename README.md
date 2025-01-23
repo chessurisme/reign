@@ -7,7 +7,7 @@ The `Reign` class is a lightweight library for managing IndexedDB operations in 
 ## Features
 
 - Easy setup and initialization of IndexedDB databases.
-- Support for object store creation during database upgrades.
+- Support for multiple object store creation during database upgrades.
 - CRUD operations (`create`, `read`, `update`, and `delete`) with asynchronous promises.
 - Designed for flexibility and reusability in modern JavaScript applications.
 
@@ -16,21 +16,21 @@ The `Reign` class is a lightweight library for managing IndexedDB operations in 
 You can include the `Reign` class in your project by importing it directly:
 
 ```javascript
-import { Reign } from '..';
+import Reign from './path/to/Reign';
 ```
 
-Ensure you also import the utility modules (`verifyParameters` and `createTransaction`) if needed.
+Ensure you also have the utility modules (`verifyParameters` and `createTransaction`) available.
 
 ## Usage
 
 ### Creating a Reign Instance
 
-Instantiate a `Reign` object by providing the `databaseName`, `storeName`, and `version` parameters.
+Instantiate a `Reign` object by providing the `databaseName`, `storeNames` (as an array), and `version` parameters:
 
 ```javascript
 const db = new Reign({
 	databaseName: 'MyDatabase',
-	storeName: 'MyStore',
+	storeNames: ['Users', 'Products'], // Multiple stores supported
 	version: 1
 });
 ```
@@ -45,37 +45,37 @@ await db.init();
 
 ### Adding or Updating a Record
 
-Use the `update` method to add a new record or update an existing one:
+Use the `update` method to add a new record or update an existing one in a specific store:
 
 ```javascript
-const recordId = await db.update({ id: 1, name: 'Reign', age: 8 });
+const recordId = await db.update('Users', { name: 'John Doe', age: 30 });
 console.log(`Record saved with ID: ${recordId}`);
 ```
 
 ### Retrieving All Records
 
-Retrieve all records in the object store:
+Retrieve all records from a specific object store:
 
 ```javascript
-const records = await db.read();
-console.log(records);
+const users = await db.read('Users');
+console.log(users);
 ```
 
 ### Retrieving a Record by ID
 
-Fetch a specific record by its ID:
+Fetch a specific record by its ID from a specific store:
 
 ```javascript
-const record = await db.get(1);
-console.log(record);
+const user = await db.get('Users', 1);
+console.log(user);
 ```
 
 ### Deleting a Record by ID
 
-Delete a record by its ID:
+Delete a record by its ID from a specific store:
 
 ```javascript
-await db.delete(1);
+await db.delete('Users', 1);
 console.log('Record deleted');
 ```
 
@@ -84,55 +84,60 @@ console.log('Record deleted');
 ### Constructor
 
 ```javascript
-new Reign({ databaseName, storeName, version });
+new Reign({ databaseName, storeNames, version });
 ```
 
 - **`databaseName`** (`String`): Name of the IndexedDB database.
-- **`storeName`** (`String`): Name of the object store.
+- **`storeNames`** (`String[]`): Array of object store names to create.
 - **`version`** (`Number`): Version number for the database.
 
 ### Methods
 
 #### `init()`
 
-Initializes the database connection. Creates the object store if it doesn't already exist.
+Initializes the database connection. Creates the specified object stores if they don't already exist.
 
 **Returns**: `Promise<IDBDatabase>`
 
 ---
 
-#### `update(data)`
+#### `update(storeName, data)`
 
-Adds or updates a record in the object store.
+Adds or updates a record in the specified object store.
 
+- **`storeName`** (`String`): Name of the object store.
 - **`data`** (`Object`): The record to add or update.
 
 **Returns**: `Promise<number>` – The ID of the added or updated record.
 
 ---
 
-#### `read()`
+#### `read(storeName)`
 
-Retrieves all records from the object store.
+Retrieves all records from the specified object store.
+
+- **`storeName`** (`String`): Name of the object store.
 
 **Returns**: `Promise<Array<Object>>`
 
 ---
 
-#### `get(id)`
+#### `get(storeName, id)`
 
-Retrieves a specific record by its ID.
+Retrieves a specific record by its ID from the specified object store.
 
+- **`storeName`** (`String`): Name of the object store.
 - **`id`** (`Number`): The ID of the record to retrieve.
 
 **Returns**: `Promise<Object>`
 
 ---
 
-#### `delete(id)`
+#### `delete(storeName, id)`
 
-Deletes a specific record by its ID.
+Deletes a specific record by its ID from the specified object store.
 
+- **`storeName`** (`String`): Name of the object store.
 - **`id`** (`Number`): The ID of the record to delete.
 
 **Returns**: `Promise<undefined>`
@@ -143,7 +148,7 @@ All methods reject with an appropriate error if an operation fails. Use `try-cat
 
 ```javascript
 try {
-	const data = await db.get(1);
+	const user = await db.get('Users', 1);
 } catch (error) {
 	console.error('Error fetching record:', error);
 }
@@ -151,4 +156,4 @@ try {
 
 ## License
 
-This project is open-source and available under the [MIT License](LICENSE).
+This project is open-source and available under the [MIT License](LICENSE.md).
