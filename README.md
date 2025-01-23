@@ -1,8 +1,8 @@
 <img src="./assets/Reign.png" alt="Reign logo" height="150">
 
-# Reign IDB
+# Reign (or Reign IDB)
 
-The `Reign` class is a lightweight library for managing IndexedDB operations in modern web applications. It simplifies database interactions like creating, updating, retrieving, and deleting records using a clean and intuitive API.
+`Reign` is a lightweight library for managing IndexedDB operations in modern web applications. It simplifies database interactions like creating, updating, retrieving, and deleting records using a clean and intuitive API.
 
 ## Features 🌟
 

@@ -1,6 +1,6 @@
 {
 	"name": "reign-idb",
-	"description": "A lightweight library for managing IndexedDB operations in modern web applications.",
+	"description": "Reign (or `reign-idb` short for Reign IndexedDB) is lightweight library for managing IndexedDB operations in modern web applications.",
 	"version": "1.0.0",
 	"main": "index.js",
 	"scripts": {
@@ -14,7 +14,9 @@
 	"files": [
 		"lib",
 		"README.md",
-		"LICENSE.md"
+		"LICENSE.md",
+		"CHANGELOG.md",
+		"assets"
 	],
 	"author": "Chessurisme",
 	"license": "MIT",
