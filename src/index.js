@@ -8,26 +8,22 @@ class Reign {
 	/**
 	 * Creates a new instance of Reign.
 	 *
-	 * @param {Object} options - The options for the Reign instance
-	 * @param {String} options.databaseName - The name of the IndexedDB database
-	 * @param {String} options.storeName - The name of the IndexedDB store
-	 * @param {Number} options.version - The version of the IndexedDB database
+	 * @param {Object} options - The options for the Reign instance.
+	 * @param {String} options.databaseName - The name of the IndexedDB database.
+	 * @param {String[]} options.storeNames - An array of store names to be created in the database.
+	 * @param {Number} options.version - The version of the IndexedDB database.
 	 */
-	constructor({ databaseName, storeName, version } = {}) {
-		verifyParameters(databaseName, storeName, version);
+	constructor({ databaseName, storeNames, version } = {}) {
+		verifyParameters(databaseName, storeNames, version);
 
 		this.databaseName = databaseName;
-		this.storeName = storeName;
+		this.storeNames = storeNames;
 		this.version = version;
 		this.db = null;
 	}
 
 	/**
 	 * Initializes the IndexedDB database connection.
-	 *
-	 * Opens a connection to the specified IndexedDB database with the given version.
-	 * If the database is created or upgraded, the `onupgradeneeded` event is triggered
-	 * to create the necessary object store if it does not exist.
 	 *
 	 * @returns {Promise<IDBDatabase>} A promise that resolves to the opened IDBDatabase instance.
 	 * @throws {Error} If an error occurs while opening the database.
@@ -38,9 +34,11 @@ class Reign {
 
 			request.onupgradeneeded = (event) => {
 				const db = event.target.result;
-				if (!db.objectStoreNames.contains(this.storeName)) {
-					db.createObjectStore(this.storeName, { keyPath: 'id', autoIncrement: true });
-				}
+				this.storeNames.forEach((storeName) => {
+					if (!db.objectStoreNames.contains(storeName)) {
+						db.createObjectStore(storeName, { keyPath: 'id', autoIncrement: true });
+					}
+				});
 			};
 
 			request.onsuccess = (event) => {
@@ -53,14 +51,15 @@ class Reign {
 	}
 
 	/**
-	 * Adds or updates a record in the object store.
+	 * Adds or updates a record in the specified object store.
 	 *
+	 * @param {String} storeName - The name of the object store.
 	 * @param {Object} data - The data to be added or updated.
 	 * @returns {Promise<number>} A promise that resolves to the ID of the added or updated record.
 	 * @throws {Error} If an error occurs while adding or updating the record.
 	 */
-	async update(data) {
-		const store = await createTransaction(this.db, this.storeName, 'readwrite');
+	async update(storeName, data) {
+		const store = await createTransaction(this.db, storeName, 'readwrite');
 		return new Promise((resolve, reject) => {
 			const request = store.put(data);
 			request.onsuccess = () => resolve(request.result);
@@ -69,13 +68,14 @@ class Reign {
 	}
 
 	/**
-	 * Retrieves all records from the object store.
+	 * Retrieves all records from the specified object store.
 	 *
-	 * @returns {Promise<Array<Object>>} A promise that resolves to an array of objects representing the records in the store.
+	 * @param {String} storeName - The name of the object store.
+	 * @returns {Promise<Object[]>} A promise that resolves to an array of records in the store.
 	 * @throws {Error} If an error occurs while retrieving the records.
 	 */
-	async read() {
-		const store = await createTransaction(this.db, this.storeName, 'readonly');
+	async read(storeName) {
+		const store = await createTransaction(this.db, storeName, 'readonly');
 		return new Promise((resolve, reject) => {
 			const request = store.getAll();
 			request.onsuccess = () => resolve(request.result);
@@ -84,14 +84,15 @@ class Reign {
 	}
 
 	/**
-	 * Retrieves a record from the object store by its ID.
+	 * Retrieves a record by its ID from the specified object store.
 	 *
+	 * @param {String} storeName - The name of the object store.
 	 * @param {number} id - The ID of the record to be retrieved.
-	 * @returns {Promise<Object>} A promise that resolves to the record with the given ID, or undefined if the record does not exist.
+	 * @returns {Promise<Object>} A promise that resolves to the record, or undefined if not found.
 	 * @throws {Error} If an error occurs while retrieving the record.
 	 */
-	async get(id) {
-		const store = await createTransaction(this.db, this.storeName, 'readonly');
+	async get(storeName, id) {
+		const store = await createTransaction(this.db, storeName, 'readonly');
 		return new Promise((resolve, reject) => {
 			const request = store.get(id);
 			request.onsuccess = () => resolve(request.result);
@@ -100,17 +101,18 @@ class Reign {
 	}
 
 	/**
-	 * Deletes a record from the object store by its ID.
+	 * Deletes a record by its ID from the specified object store.
 	 *
+	 * @param {String} storeName - The name of the object store.
 	 * @param {number} id - The ID of the record to be deleted.
-	 * @returns {Promise<undefined>} A promise that resolves when the record is deleted.
+	 * @returns {Promise<void>} A promise that resolves when the record is deleted.
 	 * @throws {Error} If an error occurs while deleting the record.
 	 */
-	async delete(id) {
-		const store = await createTransaction(this.db, this.storeName, 'readwrite');
+	async delete(storeName, id) {
+		const store = await createTransaction(this.db, storeName, 'readwrite');
 		return new Promise((resolve, reject) => {
 			const request = store.delete(id);
-			request.onsuccess = () => resolve(request.result);
+			request.onsuccess = () => resolve();
 			request.onerror = (event) => reject(event.target.error);
 		});
 	}
