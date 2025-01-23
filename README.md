@@ -29,9 +29,9 @@ Instantiate a `Reign` object by providing the `databaseName`, `storeName`, and `
 
 ```javascript
 const db = new Reign({
-  databaseName: 'MyDatabase',
-  storeName: 'MyStore',
-  version: 1,
+	databaseName: 'MyDatabase',
+	storeName: 'MyStore',
+	version: 1
 });
 ```
 
@@ -84,7 +84,7 @@ console.log('Record deleted');
 ### Constructor
 
 ```javascript
-new Reign({ databaseName, storeName, version })
+new Reign({ databaseName, storeName, version });
 ```
 
 - **`databaseName`** (`String`): Name of the IndexedDB database.
@@ -143,9 +143,9 @@ All methods reject with an appropriate error if an operation fails. Use `try-cat
 
 ```javascript
 try {
-  const data = await db.get(1);
+	const data = await db.get(1);
 } catch (error) {
-  console.error('Error fetching record:', error);
+	console.error('Error fetching record:', error);
 }
 ```
 
