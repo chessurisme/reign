@@ -1,5 +1,5 @@
 {
-	"name": "reign",
+	"name": "reign-idb",
 	"description": "A lightweight library for managing IndexedDB operations in modern web applications.",
 	"version": "1.0.0",
 	"main": "index.js",
