@@ -15,8 +15,7 @@
 		"lib",
 		"README.md",
 		"LICENSE.md",
-		"CHANGELOG.md",
-		"assets"
+		"CHANGELOG.md"
 	],
 	"author": "Chessurisme",
 	"license": "MIT",
