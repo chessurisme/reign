@@ -85,6 +85,14 @@ await db.delete('Users', 1);
 console.log('Record deleted');
 ```
 
+### Cleaning Up
+
+When you're done with database operations, it's good practice to close the connection:
+
+```javascript
+db.close();
+```
+
 ## API Reference 📘
 
 ### Constructor
@@ -147,6 +155,14 @@ Deletes a specific record by its ID from the specified object store.
 - **`id`** (`Number`): The ID of the record to delete
 
 **Returns**: `Promise<undefined>`
+
+---
+
+#### `close()`
+
+Closes the active database connection. This is useful for cleanup when the database connection is no longer needed.
+
+**Returns**: `void`
 
 ## Error Handling ⚠️
 
