@@ -13,7 +13,8 @@ describe('Reign', () => {
 	});
 
 	afterEach(() => {
-		reign.db.close();
+		if (reign.db) reign.db.close();
+
 		indexedDB.deleteDatabase(databaseName);
 	});
 
@@ -31,6 +32,12 @@ describe('Reign', () => {
 			expect(() => new Reign({ databaseName: null, storeNames, version })).toThrow();
 			expect(() => new Reign({ databaseName, storeNames: null, version })).toThrow();
 			expect(() => new Reign({ databaseName, storeNames, version: null })).toThrow();
+		});
+
+		test('should initialize after closing the database', async () => {
+			reign.close();
+			await reign.init();
+			expect(reign.db).toBeInstanceOf(IDBDatabase);
 		});
 	});
 
@@ -99,6 +106,45 @@ describe('Reign', () => {
 
 		test('should not throw an error when deleting a non-existent ID', async () => {
 			await expect(reign.delete('TestStore1', 999)).resolves.not.toThrow();
+		});
+	});
+
+	describe('close method', () => {
+		test('should close the database connection', () => {
+			expect(reign.db).toBeInstanceOf(IDBDatabase);
+			reign.close();
+			expect(reign.db).toBeNull();
+		});
+
+		test('should throw an error when trying to close without an active connection', () => {
+			reign.close();
+			expect(() => reign.close()).toThrow('No active database connection to close');
+		});
+
+		test('should allow operations after re-initializing a closed connection', async () => {
+			const data = { name: 'Test Item', value: 42 };
+
+			reign.close();
+			await reign.init();
+
+			const id = await reign.update('TestStore1', data);
+			const record = await reign.get('TestStore1', id);
+			expect(record).toEqual(expect.objectContaining(data));
+		});
+
+		test('should not affect other database instances when closing', async () => {
+			const reign2 = new Reign({ databaseName: 'TestDB2', storeNames, version });
+			await reign2.init();
+
+			reign.close();
+
+			const data = { name: 'Test Item', value: 42 };
+			const id = await reign2.update('TestStore1', data);
+			const record = await reign2.get('TestStore1', id);
+			expect(record).toEqual(expect.objectContaining(data));
+
+			reign2.close();
+			indexedDB.deleteDatabase('TestDB2');
 		});
 	});
 
