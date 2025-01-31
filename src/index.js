@@ -116,6 +116,20 @@ class Reign {
 			request.onerror = (event) => reject(event.target.error);
 		});
 	}
+
+	/**
+	 * Closes the active IndexedDB connection.
+	 *
+	 * @throws {Error} If there is no active database connection to close.
+	 */
+	close() {
+		if (!this.db) {
+			throw new Error('No active database connection to close');
+		}
+
+		this.db.close();
+		this.db = null;
+	}
 }
 
 export default Reign;
