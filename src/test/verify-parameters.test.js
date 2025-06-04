@@ -27,11 +27,23 @@ describe('verifyParameters', () => {
 
 	describe('version', () => {
 		it('should throw an error if version is not a number', () => {
-			expect(() => verifyParameters('db', ['store'], '1')).toThrow('Version is required and must be a number');
+			expect(() => verifyParameters('db', ['store'], '1')).toThrow('Version is required and must be a positive integer');
 		});
 
 		it('should throw an error if version is not provided', () => {
-			expect(() => verifyParameters('db', ['store'], undefined)).toThrow('Version is required and must be a number');
+			expect(() => verifyParameters('db', ['store'], undefined)).toThrow('Version is required and must be a positive integer');
+		});
+
+		it('should throw an error if version is NaN', () => {
+			expect(() => verifyParameters('db', ['store'], NaN)).toThrow('Version is required and must be a positive integer');
+		});
+
+		it('should throw an error if version is negative', () => {
+			expect(() => verifyParameters('db', ['store'], -1)).toThrow('Version is required and must be a positive integer');
+		});
+
+		it('should throw an error if version is not an integer', () => {
+			expect(() => verifyParameters('db', ['store'], 1.5)).toThrow('Version is required and must be a positive integer');
 		});
 	});
 });

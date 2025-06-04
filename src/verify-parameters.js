@@ -15,8 +15,8 @@ function verifyParameters(databaseName, storeNames, version) {
 		throw new Error('Store name is required and must be an array of strings');
 	}
 
-	if (typeof version !== 'number') {
-		throw new Error('Version is required and must be a number');
+	if (typeof version !== 'number' || !Number.isInteger(version) || version <= 0) {
+		throw new Error('Version is required and must be a positive integer');
 	}
 }
 
