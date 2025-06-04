@@ -104,10 +104,10 @@ describe('Reign', () => {
 			expect(record).toBeUndefined();
 		});
 
-		test('should not throw an error when deleting a non-existent ID', async () => {
-			await expect(reign.delete('TestStore1', 999)).resolves.not.toThrow();
-		});
-	});
+                test('should not throw an error when deleting a non-existent ID', async () => {
+                        await expect(reign.delete('TestStore1', 999)).resolves.toBeUndefined();
+                });
+        });
 
 	describe('close method', () => {
 		test('should close the database connection', () => {
