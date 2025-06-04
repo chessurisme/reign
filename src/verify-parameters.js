@@ -11,13 +11,17 @@ function verifyParameters(databaseName, storeNames, version) {
 		throw new Error('Database name is required and must be a string');
 	}
 
-	if (!Array.isArray(storeNames) || storeNames.length === 0 || !storeNames.every((name) => typeof name === 'string')) {
-		throw new Error('Store name is required and must be an array of strings');
-	}
+       if (
+               !Array.isArray(storeNames) ||
+               storeNames.length === 0 ||
+               !storeNames.every((name) => typeof name === 'string' && name.length > 0)
+       ) {
+               throw new Error('Store name is required and must be an array of non-empty strings');
+       }
 
-	if (typeof version !== 'number') {
-		throw new Error('Version is required and must be a number');
-	}
+        if (!Number.isInteger(version) || version <= 0) {
+                throw new Error('Version is required and must be a positive integer');
+        }
 }
 
 export { verifyParameters };
