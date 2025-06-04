@@ -154,7 +154,7 @@ Deletes a specific record by its ID from the specified object store.
 - **`storeName`** (`String`): Name of the object store
 - **`id`** (`Number`): The ID of the record to delete
 
-**Returns**: `Promise<undefined>`
+**Returns**: `Promise<void>`
 
 ---
 
