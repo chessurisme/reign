@@ -2,8 +2,8 @@
  * Verifies the parameters passed to the Reign constructor.
  *
  * @param {String} databaseName - The name of the database
- * @param {String[]} storeNames - The name of the stores
- * @param {Number} version - The version of the store
+ * @param {String[]} storeNames - The names of the stores
+ * @param {Number} version - The version of the database
  * @throws {Error} If any of the parameters is invalid
  */
 function verifyParameters(databaseName, storeNames, version) {
