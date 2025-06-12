@@ -104,10 +104,26 @@ describe('Reign', () => {
 			expect(record).toBeUndefined();
 		});
 
-                test('should not throw an error when deleting a non-existent ID', async () => {
-                        await expect(reign.delete('TestStore1', 999)).resolves.toBeUndefined();
-                });
-        });
+		test('should not throw an error when deleting a non-existent ID', async () => {
+			await expect(reign.delete('TestStore1', 999)).resolves.toBeUndefined();
+		});
+	});
+
+	describe('clear method', () => {
+		test('should remove all records from the specified store', async () => {
+			await reign.update('TestStore1', { name: 'Item 1' });
+			await reign.update('TestStore1', { name: 'Item 2' });
+
+			await reign.clear('TestStore1');
+
+			const records = await reign.read('TestStore1');
+			expect(records).toEqual([]);
+		});
+
+		test('should not throw when clearing an empty store', async () => {
+			await expect(reign.clear('TestStore1')).resolves.toBeUndefined();
+		});
+	});
 
 	describe('close method', () => {
 		test('should close the database connection', () => {
@@ -169,6 +185,11 @@ describe('Reign', () => {
 		test('should throw an error when calling delete without initializing', async () => {
 			const uninitializedReign = new Reign({ databaseName, storeNames, version });
 			await expect(uninitializedReign.delete('TestStore1', 1)).rejects.toThrow('Database is not initialized. Call init() first.');
+		});
+
+		test('should throw an error when calling clear without initializing', async () => {
+			const uninitializedReign = new Reign({ databaseName, storeNames, version });
+			await expect(uninitializedReign.clear('TestStore1')).rejects.toThrow('Database is not initialized. Call init() first.');
 		});
 	});
 });
