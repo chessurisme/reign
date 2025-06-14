@@ -158,6 +158,16 @@ Deletes a specific record by its ID from the specified object store.
 
 ---
 
+#### `clear(storeName)`
+
+Clears all records from the specified object store.
+
+- **`storeName`** (`String`): Name of the object store
+
+**Returns**: `Promise<void>`
+
+---
+
 #### `close()`
 
 Closes the active database connection. This is useful for cleanup when the database connection is no longer needed.

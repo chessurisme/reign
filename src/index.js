@@ -118,6 +118,22 @@ class Reign {
 	}
 
 	/**
+	 * Clears all records from the specified object store.
+	 *
+	 * @param {String} storeName - The name of the object store.
+	 * @returns {Promise<void>} A promise that resolves when the store is cleared.
+	 * @throws {Error} If an error occurs while clearing the store.
+	 */
+	async clear(storeName) {
+		const store = await createTransaction(this.db, storeName, 'readwrite');
+		return new Promise((resolve, reject) => {
+			const request = store.clear();
+			request.onsuccess = () => resolve();
+			request.onerror = (event) => reject(event.target.error);
+		});
+	}
+
+	/**
 	 * Closes the active IndexedDB connection.
 	 *
 	 * @throws {Error} If there is no active database connection to close.
