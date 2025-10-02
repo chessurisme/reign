@@ -101,6 +101,23 @@ class Reign {
 	}
 
 	/**
+	 * Checks if a record with the specified ID exists in the object store.
+	 *
+	 * @param {String} storeName - The name of the object store.
+	 * @param {number} id - The ID of the record to check.
+	 * @returns {Promise<boolean>} A promise that resolves to true if the record exists, otherwise false.
+	 * @throws {Error} If an error occurs while checking for the record.
+	 */
+	async isExist(storeName, id) {
+		const store = await createTransaction(this.db, storeName, 'readonly');
+		return new Promise((resolve, reject) => {
+			const request = store.get(id);
+			request.onsuccess = () => resolve(request.result !== undefined);
+			request.onerror = (event) => reject(event.target.error);
+		});
+	}
+
+	/**
 	 * Deletes a record by its ID from the specified object store.
 	 *
 	 * @param {String} storeName - The name of the object store.
