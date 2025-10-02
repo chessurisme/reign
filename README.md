@@ -9,6 +9,7 @@
 - Easy setup and initialization of IndexedDB databases
 - Support for multiple object store creation during database upgrades
 - CRUD operations (`create`, `read`, `update`, and `delete`) with asynchronous promises
+- Lightweight helpers for checking whether specific records exist before performing updates or deletes
 - Designed for flexibility and reusability in modern JavaScript applications
 
 ## Installation 📦
@@ -74,6 +75,15 @@ Fetch a specific record by its ID from a specific store:
 ```javascript
 const user = await db.get('Users', 1);
 console.log(user);
+```
+
+### Checking if a Record Exists
+
+Quickly check whether a record with a particular ID is present in the store:
+
+```javascript
+const exists = await db.isExist('Users', 1);
+console.log(`Record exists: ${exists}`);
 ```
 
 ### Deleting a Record by ID
@@ -143,7 +153,18 @@ Retrieves a specific record by its ID from the specified object store.
 - **`storeName`** (`String`): Name of the object store
 - **`id`** (`Number`): The ID of the record to retrieve
 
-**Returns**: `Promise<Object>`
+**Returns**: `Promise<Object|undefined>`
+
+---
+
+#### `isExist(storeName, id)`
+
+Checks whether a record with the provided ID is present in the specified store.
+
+- **`storeName`** (`String`): Name of the object store
+- **`id`** (`Number`): The ID of the record to check
+
+**Returns**: `Promise<boolean>`
 
 ---
 
