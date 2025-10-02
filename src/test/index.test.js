@@ -93,6 +93,19 @@ describe('Reign', () => {
 		});
 	});
 
+	describe('isExist method', () => {
+		test('should return true when a record exists in the specified store', async () => {
+			const data = { name: 'Existing Item', value: 55 };
+			const id = await reign.update('TestStore1', data);
+
+			await expect(reign.isExist('TestStore1', id)).resolves.toBe(true);
+		});
+
+		test('should return false when a record does not exist in the specified store', async () => {
+			await expect(reign.isExist('TestStore1', 12345)).resolves.toBe(false);
+		});
+	});
+
 	describe('delete method', () => {
 		test('should delete a record by ID from the specified store', async () => {
 			const data = { name: 'Deletable Item', value: 200 };
@@ -180,6 +193,11 @@ describe('Reign', () => {
 		test('should throw an error when calling get without initializing', async () => {
 			const uninitializedReign = new Reign({ databaseName, storeNames, version });
 			await expect(uninitializedReign.get('TestStore1', 1)).rejects.toThrow('Database is not initialized. Call init() first.');
+		});
+
+		test('should throw an error when calling isExist without initializing', async () => {
+			const uninitializedReign = new Reign({ databaseName, storeNames, version });
+			await expect(uninitializedReign.isExist('TestStore1', 1)).rejects.toThrow('Database is not initialized. Call init() first.');
 		});
 
 		test('should throw an error when calling delete without initializing', async () => {
