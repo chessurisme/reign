@@ -11,19 +11,61 @@ describe('verifyParameters', () => {
 		});
 	});
 
-	describe('storeName', () => {
-		it('should throw an error if storeName is not an array of string', () => {
-			expect(() => verifyParameters('db', [1], 1)).toThrow('Store name is required and must be an array of strings');
-		});
+        describe('storeName', () => {
+                it('should throw an error if storeName is not an array', () => {
+                        expect(() => verifyParameters('db', [1], 1)).toThrow(
+                                'Store name is required and must be an array of strings or configuration objects'
+                        );
+                });
 
-		it('should throw an error if storeName has an element of an array that is not a string', () => {
-			expect(() => verifyParameters('db', ['apple', 'create', 2], 1)).toThrow('Store name is required and must be an array of strings');
-		});
+                it('should throw an error if storeName has an element that is not a string or object', () => {
+                        expect(() => verifyParameters('db', ['apple', 'create', 2], 1)).toThrow(
+                                'Store name is required and must be an array of strings or configuration objects'
+                        );
+                });
 
-		it('should throw an error if storeName is not provided', () => {
-			expect(() => verifyParameters('db', undefined, 1)).toThrow('Store name is required and must be an array of strings');
-		});
-	});
+                it('should throw an error if storeName is not provided', () => {
+                        expect(() => verifyParameters('db', undefined, 1)).toThrow(
+                                'Store name is required and must be an array of strings or configuration objects'
+                        );
+                });
+
+                it('should throw an error if a store configuration object is missing a name', () => {
+                        expect(() => verifyParameters('db', [{ keyPath: 'customId' }], 1)).toThrow(
+                                'Store configuration objects must include a name or storeName property of type string'
+                        );
+                });
+
+                it('should throw an error if a store configuration object has an invalid keyPath', () => {
+                        expect(() => verifyParameters('db', [{ name: 'store', keyPath: 1 }], 1)).toThrow(
+                                'Store keyPath must be a string, an array, or null when provided'
+                        );
+                });
+
+                it('should throw an error if a store configuration object has an invalid autoIncrement option', () => {
+                        expect(() => verifyParameters('db', [{ name: 'store', autoIncrement: 'yes' }], 1)).toThrow(
+                                'Store autoIncrement must be a boolean when provided'
+                        );
+                });
+
+                it('should throw an error if a store configuration object has invalid options', () => {
+                        expect(() => verifyParameters('db', [{ name: 'store', options: 'invalid' }], 1)).toThrow(
+                                'Store options must be a plain object when provided'
+                        );
+                });
+
+                it('should allow store configuration objects with custom key paths', () => {
+                        expect(() => verifyParameters('db', [{ name: 'store', keyPath: 'customId' }], 1)).not.toThrow();
+                });
+
+                it('should allow store configuration objects that use storeName as the property', () => {
+                        expect(() => verifyParameters('db', [{ storeName: 'store', keyPath: 'customId' }], 1)).not.toThrow();
+                });
+
+                it('should allow null keyPath to explicitly disable inline keys', () => {
+                        expect(() => verifyParameters('db', [{ name: 'store', keyPath: null }], 1)).not.toThrow();
+                });
+        });
 
 	describe('version', () => {
 		it('should throw an error if version is not a number', () => {
