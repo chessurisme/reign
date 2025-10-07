@@ -1,7 +1,7 @@
 {
 	"name": "reign-idb",
 	"description": "Reign (or `reign-idb` short for Reign IndexedDB) is lightweight library for managing IndexedDB operations in modern web applications.",
-    "version": "1.5.0",
+	"version": "1.5.1",
 	"main": "lib/index.js",
 	"scripts": {
 		"test": "jest",

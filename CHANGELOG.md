@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.5.1](https://github.com/chessurisme/reign/compare/v1.5.0...v1.5.1) (2025-10-07)
+
+### Bug Fixes
+
+- accept store configuration maps and alias properties when validating constructor parameters
+- normalize store definitions before object-store creation so map entries receive default options
+
 ## 1.3.0 (2025-06-12)
 
 ### Features
