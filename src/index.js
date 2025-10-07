@@ -1,37 +1,6 @@
 import { verifyParameters } from './verify-parameters';
 import { createTransaction } from './create-transaction';
-
-const DEFAULT_STORE_OPTIONS = { keyPath: 'id', autoIncrement: true };
-
-const hasOwn = (object, property) => Object.prototype.hasOwnProperty.call(object, property);
-
-const normalizeStoreConfigurations = (storeNames) =>
-        storeNames.map((store) => {
-                if (typeof store === 'string') {
-                        return {
-                                name: store,
-                                options: { ...DEFAULT_STORE_OPTIONS },
-                        };
-                }
-
-                const { name, storeName, keyPath, autoIncrement, options = {} } = store;
-                const normalizedName = name ?? storeName;
-                const normalizedOptions = { ...options };
-
-                if (autoIncrement !== undefined) {
-                        normalizedOptions.autoIncrement = autoIncrement;
-                } else if (!hasOwn(normalizedOptions, 'autoIncrement')) {
-                        normalizedOptions.autoIncrement = DEFAULT_STORE_OPTIONS.autoIncrement;
-                }
-
-                if (keyPath !== undefined) {
-                        normalizedOptions.keyPath = keyPath;
-                } else if (!hasOwn(normalizedOptions, 'keyPath')) {
-                        normalizedOptions.keyPath = DEFAULT_STORE_OPTIONS.keyPath;
-                }
-
-                return { name: normalizedName, options: normalizedOptions };
-        });
+import { normalizeStoreConfigurations } from './store-configurations';
 
 /**
  * Represents a Reign class for managing IndexedDB operations.
@@ -42,7 +11,7 @@ class Reign {
 	 *
 	 * @param {Object} options - The options for the Reign instance.
 	 * @param {String} options.databaseName - The name of the IndexedDB database.
-         * @param {Array<String|Object>} options.storeNames - Store names or configuration objects to be created in the database.
+         * @param {Array<String|Object>|Object} options.storeNames - Store definitions as an array or plain object map to be created in the database.
 	 * @param {Number} options.version - The version of the IndexedDB database.
 	 */
         constructor({ databaseName, storeNames, version } = {}) {

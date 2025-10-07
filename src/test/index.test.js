@@ -99,6 +99,36 @@ describe('Reign', () => {
                         });
                 });
 
+                test('should accept store configuration maps keyed by store name', async () => {
+                        const mapDatabaseName = 'MapStoreConfigDB';
+                        const mapReign = new Reign({
+                                databaseName: mapDatabaseName,
+                                storeNames: {
+                                        e: { keyPath: 'level' },
+                                        cv: { keyPath: 'level', autoIncrement: false },
+                                },
+                                version,
+                        });
+
+                        await mapReign.init();
+
+                        const firstStore = mapReign.db.transaction('e', 'readonly').objectStore('e');
+                        expect(firstStore.keyPath).toBe('level');
+                        expect(firstStore.autoIncrement).toBe(true);
+
+                        const secondStore = mapReign.db.transaction('cv', 'readonly').objectStore('cv');
+                        expect(secondStore.keyPath).toBe('level');
+                        expect(secondStore.autoIncrement).toBe(false);
+
+                        mapReign.close();
+                        await new Promise((resolve, reject) => {
+                                const request = indexedDB.deleteDatabase(mapDatabaseName);
+                                request.onsuccess = () => resolve();
+                                request.onerror = () => reject(request.error);
+                                request.onblocked = () => resolve();
+                        });
+                });
+
                 test('should allow disabling the default key path by passing null', async () => {
                         const keylessDatabaseName = 'KeylessStoreDB';
                         const keylessReign = new Reign({

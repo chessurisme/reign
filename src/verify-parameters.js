@@ -2,26 +2,40 @@
  * Verifies the parameters passed to the Reign constructor.
  *
  * @param {String} databaseName - The name of the database
- * @param {Array<String|Object>} storeNames - The name of the stores or configuration objects
+ * @param {Array<String|Object>|Object} storeNames - The name of the stores or configuration objects
  * @param {Number} version - The version of the store
  * @throws {Error} If any of the parameters is invalid
  */
+import { STORE_DEFINITION_ERROR, toStoreDefinitionArray } from './store-configurations';
+
 function verifyParameters(databaseName, storeNames, version) {
         if (!databaseName || typeof databaseName !== 'string') {
                 throw new Error('Database name is required and must be a string');
         }
 
-        if (!Array.isArray(storeNames) || storeNames.length === 0) {
-                throw new Error('Store name is required and must be an array of strings or configuration objects');
+        let storeDefinitions;
+
+        try {
+                storeDefinitions = toStoreDefinitionArray(storeNames);
+        } catch (error) {
+                if (error.message === 'Store configuration map entries must be plain objects when provided') {
+                        throw error;
+                }
+
+                throw new Error(STORE_DEFINITION_ERROR);
         }
 
-        storeNames.forEach((store) => {
+        if (!Array.isArray(storeDefinitions) || storeDefinitions.length === 0) {
+                throw new Error(STORE_DEFINITION_ERROR);
+        }
+
+        storeDefinitions.forEach((store) => {
                 if (typeof store === 'string') {
                         return;
                 }
 
                 if (!store || typeof store !== 'object' || Array.isArray(store)) {
-                        throw new Error('Store name is required and must be an array of strings or configuration objects');
+                        throw new Error(STORE_DEFINITION_ERROR);
                 }
 
                 const storeName = store.name ?? store.storeName;
