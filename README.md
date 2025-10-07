@@ -107,6 +107,23 @@ When you're done with database operations, it's good practice to close the conne
 db.close();
 ```
 
+### Troubleshooting Parameter Validation
+
+Reign validates the arguments that are passed into the constructor. If the library throws `Store names must be provided as an array of strings or configuration objects, or as a plain object map of configurations`, it means the `storeNames` option was either omitted, not one of the supported collection shapes, or contains entries that are missing a `name`/`storeName` string. Valid configuration objects can supply custom `keyPath`, `autoIncrement`, or additional `options` values:
+
+```javascript
+const db = new Reign({
+  databaseName: 'MyDatabase',
+  storeNames: [
+    { storeName: 'Example', keyPath: 'level' },
+    { name: 'AnotherStore', keyPath: null, autoIncrement: true },
+  ],
+  version: 1,
+});
+```
+
+You can pass `storeNames` as either an array or a plain object map. When using a map, each key becomes the store name and the corresponding value is the configuration object. Double-check that the collection you pass to `storeNames` is constructed correctly (for example, ensure any variables you spread into it are defined) and that each entry includes the required identifier. Once those conditions are met, the constructor will accept the configuration and proceed with database initialization.
+
 ## API Reference 📘
 
 ### Constructor
@@ -116,9 +133,9 @@ new Reign({ databaseName, storeNames, version });
 ```
 
 - **`databaseName`** (`String`): Name of the IndexedDB database
-- **`storeNames`** (`Array<String|Object>`): Array of store names or configuration objects. Configuration objects may
-  define `name` or `storeName`, `keyPath`, `autoIncrement`, or a complete `options` object. When omitted, the key path
-  defaults to `id` with `autoIncrement` enabled.
+- **`storeNames`** (`Array<String|Object>` | `Object`): Array of store names or configuration objects, or a plain object
+  map whose keys are store names. Configuration objects may define `name` or `storeName`, `keyPath`, `autoIncrement`, or
+  a complete `options` object. When omitted, the key path defaults to `id` with `autoIncrement` enabled.
 - **`version`** (`Number`): Version number for the database
 
 ### Methods

@@ -12,22 +12,32 @@ describe('verifyParameters', () => {
 	});
 
         describe('storeName', () => {
+                const storeCollectionError =
+                        'Store names must be provided as an array of strings or configuration objects, or as a plain object map of configurations';
+
                 it('should throw an error if storeName is not an array', () => {
-                        expect(() => verifyParameters('db', [1], 1)).toThrow(
-                                'Store name is required and must be an array of strings or configuration objects'
-                        );
+                        expect(() => verifyParameters('db', [1], 1)).toThrow(storeCollectionError);
                 });
 
                 it('should throw an error if storeName has an element that is not a string or object', () => {
-                        expect(() => verifyParameters('db', ['apple', 'create', 2], 1)).toThrow(
-                                'Store name is required and must be an array of strings or configuration objects'
-                        );
+                        expect(() => verifyParameters('db', ['apple', 'create', 2], 1)).toThrow(storeCollectionError);
                 });
 
                 it('should throw an error if storeName is not provided', () => {
-                        expect(() => verifyParameters('db', undefined, 1)).toThrow(
-                                'Store name is required and must be an array of strings or configuration objects'
-                        );
+                        expect(() => verifyParameters('db', undefined, 1)).toThrow(storeCollectionError);
+                });
+
+                it('should throw when store definitions are provided as a plain object with invalid entries', () => {
+                        expect(() =>
+                                verifyParameters(
+                                        'db',
+                                        {
+                                                valid: { keyPath: 'id' },
+                                                invalid: 'store',
+                                        },
+                                        1
+                                )
+                        ).toThrow('Store configuration map entries must be plain objects when provided');
                 });
 
                 it('should throw an error if a store configuration object is missing a name', () => {
@@ -60,6 +70,19 @@ describe('verifyParameters', () => {
 
                 it('should allow store configuration objects that use storeName as the property', () => {
                         expect(() => verifyParameters('db', [{ storeName: 'store', keyPath: 'customId' }], 1)).not.toThrow();
+                });
+
+                it('should allow store configuration maps keyed by store name', () => {
+                        expect(() =>
+                                verifyParameters(
+                                        'db',
+                                        {
+                                                e: { keyPath: 'level' },
+                                                cv: { keyPath: 'level' },
+                                        },
+                                        1
+                                )
+                        ).not.toThrow();
                 });
 
                 it('should allow null keyPath to explicitly disable inline keys', () => {
