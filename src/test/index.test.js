@@ -19,27 +19,113 @@ describe('Reign', () => {
 	});
 
 	describe('Initialization', () => {
-		test('should initialize the database correctly with multiple stores', async () => {
-			expect(reign.db).toBeInstanceOf(IDBDatabase);
-			expect(reign.db.name).toBe(databaseName);
-			expect(reign.db.version).toBe(version);
-			storeNames.forEach((storeName) => {
-				expect(reign.db.objectStoreNames.contains(storeName)).toBe(true);
-			});
-		});
+                test('should initialize the database correctly with multiple stores', async () => {
+                        expect(reign.db).toBeInstanceOf(IDBDatabase);
+                        expect(reign.db.name).toBe(databaseName);
+                        expect(reign.db.version).toBe(version);
+                        storeNames.forEach((storeName) => {
+                                expect(reign.db.objectStoreNames.contains(storeName)).toBe(true);
+                        });
+                });
 
-		test('should throw an error if required parameters are missing', () => {
-			expect(() => new Reign({ databaseName: null, storeNames, version })).toThrow();
-			expect(() => new Reign({ databaseName, storeNames: null, version })).toThrow();
-			expect(() => new Reign({ databaseName, storeNames, version: null })).toThrow();
-		});
+                test('should default store definitions to use id as the keyPath', () => {
+                        const transaction = reign.db.transaction('TestStore1', 'readonly');
+                        const store = transaction.objectStore('TestStore1');
+                        expect(store.keyPath).toBe('id');
+                        expect(store.autoIncrement).toBe(true);
+                });
 
-		test('should initialize after closing the database', async () => {
-			reign.close();
-			await reign.init();
-			expect(reign.db).toBeInstanceOf(IDBDatabase);
-		});
-	});
+                test('should throw an error if required parameters are missing', () => {
+                        expect(() => new Reign({ databaseName: null, storeNames, version })).toThrow();
+                        expect(() => new Reign({ databaseName, storeNames: null, version })).toThrow();
+                        expect(() => new Reign({ databaseName, storeNames, version: null })).toThrow();
+                });
+
+                test('should initialize after closing the database', async () => {
+                        reign.close();
+                        await reign.init();
+                        expect(reign.db).toBeInstanceOf(IDBDatabase);
+                });
+
+                test('should allow configuring stores with custom key paths', async () => {
+                        const customDatabaseName = 'CustomKeyPathDB';
+                        const customReign = new Reign({
+                                databaseName: customDatabaseName,
+                                storeNames: [{ name: 'CustomStore', keyPath: 'customId', autoIncrement: false }],
+                                version,
+                        });
+
+                        await customReign.init();
+
+                        const transaction = customReign.db.transaction('CustomStore', 'readonly');
+                        const store = transaction.objectStore('CustomStore');
+                        expect(store.keyPath).toBe('customId');
+                        expect(store.autoIncrement).toBe(false);
+
+                        const recordKey = 'custom-1';
+                        await customReign.update('CustomStore', { customId: recordKey, name: 'Custom Item' });
+                        const record = await customReign.get('CustomStore', recordKey);
+                        expect(record).toEqual(expect.objectContaining({ customId: recordKey, name: 'Custom Item' }));
+
+                        customReign.close();
+                        await new Promise((resolve, reject) => {
+                                const request = indexedDB.deleteDatabase(customDatabaseName);
+                                request.onsuccess = () => resolve();
+                                request.onerror = () => reject(request.error);
+                                request.onblocked = () => resolve();
+                        });
+                });
+
+                test('should support store configuration objects that use storeName as the key', async () => {
+                        const aliasDatabaseName = 'AliasStoreNameDB';
+                        const aliasReign = new Reign({
+                                databaseName: aliasDatabaseName,
+                                storeNames: [{ storeName: 'AliasStore', keyPath: 'aliasId' }],
+                                version,
+                        });
+
+                        await aliasReign.init();
+
+                        const transaction = aliasReign.db.transaction('AliasStore', 'readonly');
+                        const store = transaction.objectStore('AliasStore');
+                        expect(store.keyPath).toBe('aliasId');
+
+                        aliasReign.close();
+                        await new Promise((resolve, reject) => {
+                                const request = indexedDB.deleteDatabase(aliasDatabaseName);
+                                request.onsuccess = () => resolve();
+                                request.onerror = () => reject(request.error);
+                                request.onblocked = () => resolve();
+                        });
+                });
+
+                test('should allow disabling the default key path by passing null', async () => {
+                        const keylessDatabaseName = 'KeylessStoreDB';
+                        const keylessReign = new Reign({
+                                databaseName: keylessDatabaseName,
+                                storeNames: [{ name: 'KeylessStore', keyPath: null }],
+                                version,
+                        });
+
+                        await keylessReign.init();
+
+                        const transaction = keylessReign.db.transaction('KeylessStore', 'readonly');
+                        const store = transaction.objectStore('KeylessStore');
+                        expect(store.keyPath).toBeNull();
+                        expect(store.autoIncrement).toBe(true);
+
+                        const generatedId = await keylessReign.update('KeylessStore', { name: 'Generated Key Item' });
+                        expect(typeof generatedId).toBe('number');
+
+                        keylessReign.close();
+                        await new Promise((resolve, reject) => {
+                                const request = indexedDB.deleteDatabase(keylessDatabaseName);
+                                request.onsuccess = () => resolve();
+                                request.onerror = () => reject(request.error);
+                                request.onblocked = () => resolve();
+                        });
+                });
+        });
 
 	describe('update method', () => {
 		test('should add a record to the specified store and return the ID', async () => {

@@ -36,9 +36,13 @@ Instantiate a `Reign` object by providing the `databaseName`, `storeNames` (as a
 
 ```javascript
 const db = new Reign({
-	databaseName: 'MyDatabase',
-	storeNames: ['Users', 'Products'], // Multiple stores supported
-	version: 1
+  databaseName: 'MyDatabase',
+  storeNames: [
+    'Users',
+    { name: 'Products', keyPath: 'sku' },
+    { storeName: 'Logs', keyPath: null, autoIncrement: true },
+  ],
+  version: 1
 });
 ```
 
@@ -112,7 +116,9 @@ new Reign({ databaseName, storeNames, version });
 ```
 
 - **`databaseName`** (`String`): Name of the IndexedDB database
-- **`storeNames`** (`String[]`): Array of object store names to create
+- **`storeNames`** (`Array<String|Object>`): Array of store names or configuration objects. Configuration objects may
+  define `name` or `storeName`, `keyPath`, `autoIncrement`, or a complete `options` object. When omitted, the key path
+  defaults to `id` with `autoIncrement` enabled.
 - **`version`** (`Number`): Version number for the database
 
 ### Methods

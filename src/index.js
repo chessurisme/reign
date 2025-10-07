@@ -1,6 +1,38 @@
 import { verifyParameters } from './verify-parameters';
 import { createTransaction } from './create-transaction';
 
+const DEFAULT_STORE_OPTIONS = { keyPath: 'id', autoIncrement: true };
+
+const hasOwn = (object, property) => Object.prototype.hasOwnProperty.call(object, property);
+
+const normalizeStoreConfigurations = (storeNames) =>
+        storeNames.map((store) => {
+                if (typeof store === 'string') {
+                        return {
+                                name: store,
+                                options: { ...DEFAULT_STORE_OPTIONS },
+                        };
+                }
+
+                const { name, storeName, keyPath, autoIncrement, options = {} } = store;
+                const normalizedName = name ?? storeName;
+                const normalizedOptions = { ...options };
+
+                if (autoIncrement !== undefined) {
+                        normalizedOptions.autoIncrement = autoIncrement;
+                } else if (!hasOwn(normalizedOptions, 'autoIncrement')) {
+                        normalizedOptions.autoIncrement = DEFAULT_STORE_OPTIONS.autoIncrement;
+                }
+
+                if (keyPath !== undefined) {
+                        normalizedOptions.keyPath = keyPath;
+                } else if (!hasOwn(normalizedOptions, 'keyPath')) {
+                        normalizedOptions.keyPath = DEFAULT_STORE_OPTIONS.keyPath;
+                }
+
+                return { name: normalizedName, options: normalizedOptions };
+        });
+
 /**
  * Represents a Reign class for managing IndexedDB operations.
  */
@@ -10,17 +42,18 @@ class Reign {
 	 *
 	 * @param {Object} options - The options for the Reign instance.
 	 * @param {String} options.databaseName - The name of the IndexedDB database.
-	 * @param {String[]} options.storeNames - An array of store names to be created in the database.
+         * @param {Array<String|Object>} options.storeNames - Store names or configuration objects to be created in the database.
 	 * @param {Number} options.version - The version of the IndexedDB database.
 	 */
-	constructor({ databaseName, storeNames, version } = {}) {
-		verifyParameters(databaseName, storeNames, version);
+        constructor({ databaseName, storeNames, version } = {}) {
+                verifyParameters(databaseName, storeNames, version);
 
-		this.databaseName = databaseName;
-		this.storeNames = storeNames;
-		this.version = version;
-		this.db = null;
-	}
+                this.databaseName = databaseName;
+                this.storeConfigurations = normalizeStoreConfigurations(storeNames);
+                this.storeNames = this.storeConfigurations.map(({ name }) => name);
+                this.version = version;
+                this.db = null;
+        }
 
 	/**
 	 * Initializes the IndexedDB database connection.
@@ -34,12 +67,12 @@ class Reign {
 
 			request.onupgradeneeded = (event) => {
 				const db = event.target.result;
-				this.storeNames.forEach((storeName) => {
-					if (!db.objectStoreNames.contains(storeName)) {
-						db.createObjectStore(storeName, { keyPath: 'id', autoIncrement: true });
-					}
-				});
-			};
+                                this.storeConfigurations.forEach(({ name, options }) => {
+                                        if (!db.objectStoreNames.contains(name)) {
+                                                db.createObjectStore(name, options);
+                                        }
+                                });
+                        };
 
 			request.onsuccess = (event) => {
 				this.db = event.target.result;
